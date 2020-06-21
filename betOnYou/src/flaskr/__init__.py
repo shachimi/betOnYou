@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from . import api, db
+from . import api, db, utils
 
 
 def create_app(test_config=None):
@@ -27,6 +27,7 @@ def create_app(test_config=None):
         pass
 
     db.init_app(app)
+    utils.init_app(app)
 
     app.register_blueprint(api.blueprint)
 
