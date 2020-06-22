@@ -8,7 +8,7 @@ You can get them at the following URLs:
 ## Initial setup
 
 First you need to edit the config file at `betOnYou/instance/config.py` to put your API token inside the CLASH_ROYALE_TOKEN and FORTNITE_TOKEN.
-Once it is done, go to betOnYou directory then build your docker image using `$ docker build -t bet_on_you .`
+Once it is done, go to betOnYou directory then build your docker image using `docker build -t bet_on_you .`
 Finally you can start your server by running docker with `docker run -p <available_port_on_your_machine>:5000 bet_on_you`
 Congratulations, your app is now running and you can query it.
 
