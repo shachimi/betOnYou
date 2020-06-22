@@ -260,9 +260,6 @@ def update_player(username):
          data.get('game2_username'), data.get('game1_tag'), data.get('game2_tag'), username)
     )
     db.commit()
-    game1_tag = row[1] if data.get('game1_tag', None) is None else data.get('game1_tag')
-    if game1_tag:
-        sync_user_with_tag(row[0], game1_tag)
     return {}, 200
 
 
