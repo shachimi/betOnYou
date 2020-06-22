@@ -12,7 +12,7 @@ from flaskr.db import get_db
 API_URL_BASE = 'https://api.clashroyale.com/v1/'
 
 
-def fetch_player_data(gamer_tag):
+def fetch_player_cr_data(gamer_tag):
     headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {0}'.format(current_app.config['CLASH_ROYALE_TOKEN'])
@@ -22,12 +22,12 @@ def fetch_player_data(gamer_tag):
     return requests.get(api_url, headers=headers)
 
 
-def sync_user_with_tag(user_id, gamer_tag, db=None):
+def sync_cr_user_with_tag(user_id, gamer_tag, db=None):
     """Fetch data for a user from clash royale and update its data.
 
     Return True if we succeed to fetch the data, False otherwise.
     """
-    response = fetch_player_data(gamer_tag)
+    response = fetch_player_cr_data(gamer_tag)
     if response.status_code == 200:
         json_response = json.loads(response.content.decode('utf-8'))
         if db is None:
@@ -57,7 +57,7 @@ def fetch_stats_command():
     c.execute('SELECT id, game1_tag FROM player WHERE game1_tag IS NOT NULL AND is_active <> 0')
 
     for row in c.fetchall():
-        if sync_user_with_tag(row[0], row[1], db):
+        if sync_cr_user_with_tag(row[0], row[1], db):
             click.echo('Data successfully sync for user %d with gamer tag %s' % (row[0], row[1]))
         else:
             click.echo('Could not sync data for user %d with gamer tag %s' % (row[0], row[1]))

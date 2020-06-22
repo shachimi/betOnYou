@@ -4,7 +4,12 @@ import json
 from flask import Blueprint, current_app, request
 
 from flaskr.db import get_db
-from flaskr.utils.cr_api import fetch_player_data, sync_user_with_tag
+from flaskr.utils.cr_api import fetch_player_cr_data, sync_cr_user_with_tag
+from flaskr.utils.fortnite_api import (
+    fetch_player_fortnite_data,
+    get_account_id_from_username,
+    sync_fortnite_user_with_tag,
+)
 
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
@@ -26,15 +31,14 @@ def check_api_token(request):
 @blueprint.route('/players', methods=('GET',))
 def retrieve_players():
     c = get_db().cursor()
-    c.execute('select id, username, email, first_name, last_name from player where is_active = 1')
+    c.execute('select username, email, first_name, last_name from player where is_active = 1')
 
     return {'results': [
         {
-            'id': row[0],
-            'username': row[1],
-            'email': row[2],
-            'first_name': row[3],
-            'last_name': row[4]
+            'username': row[0],
+            'email': row[1],
+            'first_name': row[2],
+            'last_name': row[3]
         }
         for row in c.fetchall()
     ]}
@@ -57,7 +61,38 @@ def retrieve_player_game_data(username):
     if row[0] is None:
         return {'error': 'no player tag record for the given user'}, 400
 
-    response = fetch_player_data(row[0])
+    response = fetch_player_cr_data(row[0])
+    if response.status_code / 100 != 2:
+        return {'error': 'unable to fetch player data, got %s error.' % response.status_code}
+
+    return json.loads(response.content.decode('utf-8'))
+
+
+@blueprint.route('/game2/<username>', methods=('GET',))
+def retrieve_player_fortnite_data(username):
+    if not check_api_token(request):
+        return {'error': 'Unauthorized'}, 401
+
+    c = get_db().cursor()
+    c.execute(
+        'select game2_username, game2_tag from player where username = ?',
+        (username, ),
+    )
+
+    row = c.fetchone()
+    if row is None:
+        return {}, 404
+    if row[1] is None:
+        if row[0] is None:
+            return {'error': 'no player tag record for the given user'}, 400
+        else:
+            gamer_tag = get_account_id_from_username(row[0])
+            if gamer_tag is None:
+                return {'error': 'unable to retrieve gamer_tag using username'}, 400
+    else:
+        gamer_tag = row[1]
+
+    response = fetch_player_fortnite_data(gamer_tag)
     if response.status_code / 100 != 2:
         return {'error': 'unable to fetch player data, got %s error.' % response.status_code}
 
@@ -81,7 +116,36 @@ def refresh_player_game_data(username):
     if row[1] is None:
         return {'error': 'no player tag record for the given user'}, 400
 
-    if not sync_user_with_tag(row[0], row[1]):
+    if not sync_cr_user_with_tag(row[0], row[1]):
+        return {'error': 'something went wrong when trying to refresh player data'}, 500
+    return {}
+
+
+@blueprint.route('/game2/<username>/refresh', methods=('POST',))
+def refresh_player_fortnite_data(username):
+    if not check_api_token(request):
+        return {'error': 'Unauthorized'}, 401
+
+    c = get_db().cursor()
+    c.execute(
+        'select id, game2_username, game2_tag from player where username = ?',
+        (username, ),
+    )
+
+    row = c.fetchone()
+    if row is None:
+        return {}, 404
+    if row[2] is None:
+        if row[1] is None:
+            return {'error': 'no player tag record for the given user'}, 400
+        else:
+            gamer_tag = get_account_id_from_username(row[1])
+            if gamer_tag is None:
+                return {'error': 'unable to retrieve gamer_tag using username'}, 400
+    else:
+        gamer_tag = row[2]
+
+    if not sync_fortnite_user_with_tag(row[0], gamer_tag):
         return {'error': 'something went wrong when trying to refresh player data'}, 500
     return {}
 
@@ -90,7 +154,8 @@ def refresh_player_game_data(username):
 def retrieve_player(username):
     c = get_db().cursor()
     c.execute(
-        'select id, email, first_name, last_name, game1_username from player where username = ?',
+        'select id, email, first_name, last_name, game1_username, game2_username from'
+        ' player where username = ?',
         (username, ),
     )
 
@@ -114,13 +179,31 @@ def retrieve_player(username):
             'select wins, loses, trophies from clash_royale_stats where user_id = ?',
             (row[0], ),
         )
-        row = c.fetchone()
-        if row is not None:
+        cr_row = c.fetchone()
+        if cr_row is not None:
             response['clash_royale'].update({
-                'wins': row[0],
-                'loses': row[1],
-                'trophies': row[2]
+                'wins': cr_row[0],
+                'loses': cr_row[1],
+                'trophies': cr_row[2]
             })
+
+    if row[5] is not None:
+        response['fortnite'] = {
+            'username': row[5]
+        }
+        c = get_db().cursor()
+        c.execute(
+            'select top1, kills, matchesplayed from fortnite_stats where user_id = ?',
+            (row[0], ),
+        )
+        ft_row = c.fetchone()
+        if ft_row is not None:
+            response['fortnite'].update({
+                'top1': ft_row[0],
+                'kills': ft_row[1],
+                'matches_played': ft_row[2]
+            })
+
 
     return response
 
@@ -172,9 +255,9 @@ def update_player(username):
 
     db.execute(
         'UPDATE player SET first_name = ?, last_name = ?,'
-        ' game1_username = ?, game2_username = ?, game1_tag = ? WHERE username = ?',
+        ' game1_username = ?, game2_username = ?, game1_tag = ?, game2_tag = ? WHERE username = ?',
         (data.get('first_name'), data.get('last_name'), data.get('game1_username'),
-         data.get('game2_username'), data.get('game1_tag'), username)
+         data.get('game2_username'), data.get('game1_tag'), data.get('game2_tag'), username)
     )
     db.commit()
     game1_tag = row[1] if data.get('game1_tag', None) is None else data.get('game1_tag')

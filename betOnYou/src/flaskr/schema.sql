@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS player (
   is_active INT(11),
   game1_username VARCHAR(255) UNIQUE,
   game1_tag VARCHAR(255) UNIQUE,
-  game2_username VARCHAR(255) UNIQUE
+  game2_username VARCHAR(255) UNIQUE,
+  game2_tag VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS clash_royale_stats (
@@ -15,5 +16,13 @@ CREATE TABLE IF NOT EXISTS clash_royale_stats (
   wins INTEGER,
   loses INTEGER,
   trophies INTEGER,
+  FOREIGN KEY (user_id) REFERENCES player(id)
+);
+
+CREATE TABLE IF NOT EXISTS fortnite_stats (
+  user_id INTERGER PRIMARY KEY NOT NULL,
+  top1 INTEGER,
+  kills INTEGER,
+  matchesplayed INTEGER,
   FOREIGN KEY (user_id) REFERENCES player(id)
 );
