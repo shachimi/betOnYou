@@ -6,7 +6,7 @@ import click
 from flask import current_app
 from flask.cli import with_appcontext
 
-from .db import get_db
+from flaskr.db import get_db
 
 
 API_URL_BASE = 'https://api.clashroyale.com/v1/'

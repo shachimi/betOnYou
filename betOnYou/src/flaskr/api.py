@@ -1,13 +1,26 @@
 import functools
 import json
 
-from flask import Blueprint, request
+from flask import Blueprint, current_app, request
 
-from .db import get_db
-from .utils import fetch_player_data, sync_user_with_tag
+from flaskr.db import get_db
+from flaskr.utils.cr_api import fetch_player_data, sync_user_with_tag
 
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
+
+
+def check_api_token(request):
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return False
+    auth = auth_header.split(' ')
+    # add a User/Secret table to log which user access the API in update mode
+    return (
+        len(auth) == 2 and
+        auth[0].lower() == 'bearer' and
+        auth[1] == current_app.config['API_SECRET']
+    )
 
 
 @blueprint.route('/players', methods=('GET',))
@@ -29,6 +42,9 @@ def retrieve_players():
 
 @blueprint.route('/game1/<username>', methods=('GET',))
 def retrieve_player_game_data(username):
+    if not check_api_token(request):
+        return {'error': 'Unauthorized'}, 401
+
     c = get_db().cursor()
     c.execute(
         'select game1_tag from player where username = ?',
@@ -50,6 +66,9 @@ def retrieve_player_game_data(username):
 
 @blueprint.route('/game1/<username>/refresh', methods=('POST',))
 def refresh_player_game_data(username):
+    if not check_api_token(request):
+        return {'error': 'Unauthorized'}, 401
+
     c = get_db().cursor()
     c.execute(
         'select id, game1_tag from player where username = ?',
@@ -108,6 +127,9 @@ def retrieve_player(username):
 
 @blueprint.route('/add_player', methods=('POST',))
 def add_player():
+    if not check_api_token(request):
+        return {'error': 'Unauthorized'}, 401
+
     data = request.get_json()
     username = data.get('username')
     email = data.get('email')
@@ -132,6 +154,9 @@ def add_player():
 
 @blueprint.route('/update_player/<username>', methods=('POST',))
 def update_player(username):
+    if not check_api_token(request):
+        return {'error': 'Unauthorized'}, 401
+
     data = request.get_json()
     db = get_db()
 
@@ -161,6 +186,9 @@ def update_player(username):
 
 @blueprint.route('/delete_player/<username>', methods=('DELETE',))
 def delete_player(username):
+    if not check_api_token(request):
+        return {'error': 'Unauthorized'}, 401
+
     db = get_db()
     c = db.cursor()
     c.execute(

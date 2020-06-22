@@ -1,7 +1,7 @@
 FROM python:latest
 
 COPY src/ /app
-COPY instance /instance
+COPY instance /app/instance
 
 WORKDIR /app
 
