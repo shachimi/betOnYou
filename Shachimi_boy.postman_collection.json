@@ -1,0 +1,532 @@
+{
+	"info": {
+		"_postman_id": "eb5b6345-8aaa-44ef-948e-d55ad8ffd5b9",
+		"name": "Shachimi_boy",
+		"description": "Sample collection to use with shachimi_boy API.\n\nYou need to ask SECRET to maintener of API in order to call private methods\n\nWhen calling the API `<username>` must be replaced by the username used to create the player wanted",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create player",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"mister_toto\",\n    \"email\": \"mister.toto@test.te\",\n    \"first_name\": \"Mister\",\n    \"last_name\": \"Toto\",\n    \"game1_username\": \"Ninja\"\n    \"game1_tag\": \"#xxxxxxxx\",\n    \"game2_username\": \"Ninja\",\n    \"game2_tag\": \"4735ce9132924caf8a5b17789b40f79c\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/add_player",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"add_player"
+					]
+				},
+				"description": "Create a player inside the Databse.\nNeed at least 'username' and 'email' in order to create a new entry.\n\nReturn 201 on success\n/!\\ Warning: currently the API doesn't check/catch exception throw in case of dupplicate entry inside the DB"
+			},
+			"response": [
+				{
+					"name": "Create player",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer test",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"mister_toto\",\n    \"email\": \"mister.toto@test.te\",\n    \"first_name\": \"Mister\",\n    \"last_name\": \"Toto\",\n    \"game1_username\": \"Ninja\"\n    \"game1_tag\": \"#xxxxxxxx\",\n    \"game2_username\": \"Ninja\",\n    \"game2_tag\": \"4735ce9132924caf8a5b17789b40f79c\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/add_player",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"add_player"
+							]
+						}
+					},
+					"status": "CREATED",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "3"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/1.0.1 Python/3.4.3"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 22 Jun 2020 11:39:22 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{}"
+				}
+			]
+		},
+		{
+			"name": "Get Players",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/players",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"players"
+					]
+				},
+				"description": "Get the list of all active players inside the database."
+			},
+			"response": [
+				{
+					"name": "Get Players",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/players",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"players"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "207"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/1.0.1 Python/3.8.3"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 22 Jun 2020 14:12:42 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"results\": [\n        {\n            \"email\": \"test.test@test.te\",\n            \"first_name\": \"Test\",\n            \"id\": 1,\n            \"last_name\": \"User\",\n            \"username\": \"test\"\n        },\n        {\n            \"email\": \"mister.toto@test.te\",\n            \"first_name\": null,\n            \"id\": 2,\n            \"last_name\": null,\n            \"username\": \"mister_toto\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Get player",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/player/<username>",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"<username>"
+					]
+				},
+				"description": "Get detail infos for a player inside DB."
+			},
+			"response": [
+				{
+					"name": "Get player",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/player/test",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"player",
+								"test"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "247"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/1.0.1 Python/3.8.3"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 22 Jun 2020 14:43:56 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"clash_royale\": {\n        \"loses\": 68,\n        \"trophies\": 1052,\n        \"username\": \"dragonHS\",\n        \"wins\": 92\n    },\n    \"email\": \"test.test@test.te\",\n    \"first_name\": \"Test\",\n    \"fortnite\": {\n        \"kills\": 136071,\n        \"matches_played\": 22033,\n        \"top1\": 7715,\n        \"username\": \"Ninja\"\n    },\n    \"last_name\": \"Tester\",\n    \"username\": \"test\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Update player",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "test",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"game2_username\": \"Ninja\",\n    \"game1_username\": \"dragonHS\",\n    \"first_name\": \"Test\",\n    \"last_name\": \"Tester\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/update_player/<username>",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"update_player",
+						"<username>"
+					]
+				},
+				"description": "Update a player detail inside the DB.\n\nNote: username and email are immutable so you cannot give them as parameters\n\nNote2: all absent parameters will be considered as removed value from DB"
+			},
+			"response": [
+				{
+					"name": "Update player",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"game2_username\": \"Ninja\",\n    \"game1_username\": \"dragonHS\",\n    \"first_name\": \"Test\",\n    \"last_name\": \"Tester\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/update_player/test",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"update_player",
+								"test"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "3"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/1.0.1 Python/3.8.3"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 22 Jun 2020 14:19:48 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{}"
+				}
+			]
+		},
+		{
+			"name": "Delete player",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "test",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/delete_player/<username>",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"delete_player",
+						"<username>"
+					]
+				},
+				"description": "Delete a player from the database\n\nNote: we could have just set it to inactive then reset is_active to 1 at next update but I choose to be simple and simply delete it."
+			},
+			"response": []
+		},
+		{
+			"name": "Get CR data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/game1/<username>",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"game1",
+						"<username>"
+					]
+				},
+				"description": "Get ClashRoyale `players` result if the user has a valid game1_tag inside the DB.\n\nForward the answer of the ClashRoyale API"
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh CR data",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"type": "text",
+						"equals": true
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/game1/<username>/refresh",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"game1",
+						"<username>",
+						"refresh"
+					]
+				},
+				"description": "Refresh inner data related to ClashRoyale API if the user has a valid game1_tag"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Fortnite data",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/game2/<username>",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"game2",
+						"<username>"
+					]
+				},
+				"description": "Get Fortnite result if the user has a valid game2_tag or game2_username inside the DB.\n\nForward the answer of the Fortnite `stats` API"
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Fortnite data",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"type": "text",
+						"equals": true
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/game2/<username>/refresh",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"game2",
+						"<username>",
+						"refresh"
+					]
+				},
+				"description": "Refresh inner data related to Fortnite API if the user has a valid game2_tag or game2_username"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e17e3c8e-10ba-4898-ae3c-41f3d75ee6e1",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "651f2f02-1de7-4f29-8469-aab9427f8c02",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
