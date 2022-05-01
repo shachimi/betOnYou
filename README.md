@@ -8,8 +8,8 @@ You can get them at the following URLs:
 ## Initial setup
 
 First you need to edit the config file at `betOnYou/instance/config.py` to put your API token inside the CLASH_ROYALE_TOKEN and FORTNITE_TOKEN.
-Once it is done, go to betOnYou directory then build your docker image using `docker build -t bet_on_you .`
-Finally you can start your server by running docker with `docker run -p <available_port_on_your_machine>:5000 bet_on_you`
+Once it is done, go to betOnYou directory then build your docker images using `docker-compose build`
+Finally you can start your server by running docker with `docker-compose up`
 Congratulations, your app is now running and you can query it.
 
 ## Query The API
@@ -21,7 +21,7 @@ Here are the public endpoints:
 
 Get the list of all players recorded inside the DB. Only returns `username`, `email`, `first_name` and `last_name`
 ```
-curl http://127.0.0.1:5000/api/players
+curl http://127.0.0.1:8080/api/players
 {"results":[{"email":"test.test@test.te","first_name":"Test","last_name":"User","username":"test"},{"email":"mister.toto@test.te","first_name":null,"last_name":null,"username":"mister_toto"}]}
 ```
 
@@ -29,7 +29,7 @@ curl http://127.0.0.1:5000/api/players
 
 Get the details information for one player given its username. Returns `username`, `email`, `first_name` and `last_name` and specific stored data for fortnite and clash_royale if data stored inside 
 ```
-curl http://127.0.0.1:5000/api/player/test
+curl http://127.0.0.1:8080/api/player/test
 {"clash_royale":{"loses":68,"trophies":1052,"username":"dragonHS","wins":92},"email":"test.test@test.te","first_name":"Test","fortnite":{"kills":136071,"matches_played":22033,"top1":7715,"username":"Ninja"},"last_name":"Tester","username":"test"}
 ```
 As you can see, we do not return the gamer_tag for either of the game, we only return the public username.
