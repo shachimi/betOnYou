@@ -30,8 +30,10 @@ def check_api_token(request):
 
 @blueprint.route('/players', methods=('GET',))
 def retrieve_players():
-    c = get_db().cursor()
-    c.execute('select username, email, first_name, last_name from player where is_active = 1')
+    session = get_db().session()
+    c = session.execute(
+        'select username, email, first_name, last_name from player where is_active = 1'
+    ).cursor
 
     return {'results': [
         {
@@ -49,11 +51,11 @@ def retrieve_player_game_data(username):
     if not check_api_token(request):
         return {'error': 'Unauthorized'}, 401
 
-    c = get_db().cursor()
-    c.execute(
+    sessions = get_db().session()
+    c = session.execute(
         'select game1_tag from player where username = ?',
         (username, ),
-    )
+    ).cursor
 
     row = c.fetchone()
     if row is None:
@@ -73,11 +75,11 @@ def retrieve_player_fortnite_data(username):
     if not check_api_token(request):
         return {'error': 'Unauthorized'}, 401
 
-    c = get_db().cursor()
-    c.execute(
+    session = get_db().sessions()
+    c = session.execute(
         'select game2_username, game2_tag from player where username = ?',
         (username, ),
-    )
+    ).cursor
 
     row = c.fetchone()
     if row is None:
@@ -104,11 +106,11 @@ def refresh_player_game_data(username):
     if not check_api_token(request):
         return {'error': 'Unauthorized'}, 401
 
-    c = get_db().cursor()
-    c.execute(
+    session = get_db().session()
+    c = session.execute(
         'select id, game1_tag from player where username = ?',
         (username, ),
-    )
+    ).cursor
 
     row = c.fetchone()
     if row is None:
@@ -126,11 +128,11 @@ def refresh_player_fortnite_data(username):
     if not check_api_token(request):
         return {'error': 'Unauthorized'}, 401
 
-    c = get_db().cursor()
-    c.execute(
+    session = get_db().session()
+    c = session.execute(
         'select id, game2_username, game2_tag from player where username = ?',
         (username, ),
-    )
+    ).cursor
 
     row = c.fetchone()
     if row is None:
@@ -152,12 +154,12 @@ def refresh_player_fortnite_data(username):
 
 @blueprint.route('/player/<username>', methods=('GET',))
 def retrieve_player(username):
-    c = get_db().cursor()
-    c.execute(
+    session = get_db().session()
+    c = session.execute(
         'select id, email, first_name, last_name, game1_username, game2_username from'
         ' player where username = ?',
         (username, ),
-    )
+    ).cursor
 
     row = c.fetchone()
     if row is None:
@@ -174,11 +176,11 @@ def retrieve_player(username):
         response['clash_royale'] = {
             'username': row[4]
         }
-        c = get_db().cursor()
-        c.execute(
+        session = get_db().session()
+        c = session.execute(
             'select wins, loses, trophies from clash_royale_stats where user_id = ?',
             (row[0], ),
-        )
+        ).cursor
         cr_row = c.fetchone()
         if cr_row is not None:
             response['clash_royale'].update({
@@ -191,11 +193,11 @@ def retrieve_player(username):
         response['fortnite'] = {
             'username': row[5]
         }
-        c = get_db().cursor()
-        c.execute(
+        session = get_db().session()
+        c = session.execute(
             'select top1, kills, matchesplayed from fortnite_stats where user_id = ?',
             (row[0], ),
-        )
+        ).cursor
         ft_row = c.fetchone()
         if ft_row is not None:
             response['fortnite'].update({
@@ -223,13 +225,14 @@ def add_player():
         error = 'Player needs username and email to be registered'
 
     if error is None:
-        db.execute(
-            'INSERT INTO player (username, email, first_name, last_name, is_active, '
-            ' game1_username, game2_username, game1_tag) VALUES (?, ?, ?, ?, 1, ?, ?, ?)',
-            (username, email, data.get('first_name'), data.get('last_name'),
-             data.get('game1_username'), data.get('game2_username'), data.get('game1_tag'))
+        session = db.session()
+        session.execute(
+            f'INSERT INTO player (username, email, first_name, last_name, is_active, '
+            f' game1_username, game2_username, game1_tag) VALUES ("{username}", "{email}", '
+            f"'{data.get('first_name')}', '{data.get('last_name')}', 1, '{data.get('game1_username')}', "
+            f"'{data.get('game2_username')}', '{data.get('game1_tag')}')"
         )
-        db.commit()
+        session.commit()
         return {}, 201
 
     return {'error': error}
@@ -243,11 +246,11 @@ def update_player(username):
     data = request.get_json()
     db = get_db()
 
-    c = db.cursor()
-    c.execute(
+    session = db.session()
+    c = session.execute(
         'select id, game1_tag from player where username = ?',
         (username, ),
-    )
+    ).cursor
 
     row = c.fetchone()
     if row is None:
@@ -270,16 +273,16 @@ def delete_player(username):
         return {'error': 'Unauthorized'}, 401
 
     db = get_db()
-    c = db.cursor()
-    c.execute(
+    session = db.session()
+    c = session.execute(
         'select username from player where username = ?',
         (username, ),
-    )
+    ).cursor
 
     row = c.fetchone()
     if row is None:
         return {}, 404
 
-    c.execute('DELETE FROM player WHERE username = ?', (username,))
-    db.commit()
+    session.execute('DELETE FROM player WHERE username = ?', (username,))
+    session.commit()
     return {}
