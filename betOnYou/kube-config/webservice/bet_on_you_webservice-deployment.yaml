@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bet-on-you-webservice
+  labels:
+    app: bet-on-you-webservice
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bet-on-you-webservice
+  template:
+    metadata:
+      labels:
+        app: bet-on-you-webservice
+    spec:
+      containers:
+      - name: bet-on-you-webservice
+        image: bet_on_you
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        - name: FLASK_ENV
+          value: 'development'
+        - name: FLASK_APP
+          value: 'flaskr'
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bet-on-you-secrets
+              key: mysql-root-password
+        ports:
+        - containerPort: 5000
+        command: ["flask", "run", "--host=0.0.0.0"]

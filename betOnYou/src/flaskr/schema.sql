@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS player (
   first_name VARCHAR(255),
   last_name VARCHAR(255),
   is_active INT(11),
-  game1_username VARCHAR(255) UNIQUE,
-  game1_tag VARCHAR(255) UNIQUE,
-  game2_username VARCHAR(255) UNIQUE,
-  game2_tag VARCHAR(255) UNIQUE
+  game1_username VARCHAR(255),
+  game1_tag VARCHAR(255),
+  game2_username VARCHAR(255),
+  game2_tag VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS clash_royale_stats (

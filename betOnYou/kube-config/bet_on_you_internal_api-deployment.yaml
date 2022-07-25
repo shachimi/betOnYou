@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bet-on-you-webservice
+  labels:
+    app: bet-on-you-webservice
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bet-on-you-webservice
+  template:
+    metadata:
+      labels:
+        app: bet-on-you-webservice
+    spec:
+      containers:
+      - name: bet-on-you-webservice
+        image: bet_on_you
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        command: ["flask", "run", "--host=0.0.0.0"]

@@ -283,6 +283,6 @@ def delete_player(username):
     if row is None:
         return {}, 404
 
-    session.execute('DELETE FROM player WHERE username = ?', (username,))
-    session.commit()
+    db.execute('DELETE FROM player WHERE username = ?', (username,))
+    db.commit()
     return {}

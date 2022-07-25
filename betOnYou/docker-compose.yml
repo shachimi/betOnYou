@@ -1,22 +1,47 @@
 version: '3.9'
 
-networks:
-  bet_on_you_network: {}
-
 services:
-  bet_on_you:
+  bet_on_you_base:
+    build:
+      context: ./
+      dockerfile: Dockerfile.base
+    image: boy_base
+    command: /bin/false
+
+  bet_on_you-webservice:
     build:
       context: ./
       dockerfile: Dockerfile
     image: bet_on_you
-    container_name: bet_on_you
+    container_name: bet_on_you_webservice
+    depends_on:
+      - bet_on_you_base
+      - db
+    environment:
+      - FLASK_ENV=docker
+      - FLASK_APP=flaskr
     ports:
-      - 8080:5000
+      - 127.0.0.1:8080:5000
     networks:
       - bet_on_you_network
-    volumes:
-     - ./src/:/app
-     - ./instance/:/app/instance
+    command: flask run --host=0.0.0.0
+
+  bet_on_you-internal-api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: bet_on_you
+    container_name: bet_on_you_internal_api
+    depends_on:
+      - bet_on_you_base
+      - db
+    environment:
+      - FLASK_ENV=docker
+      - FLASK_APP=flaskr
+    ports:
+      - 127.0.0.1:8082:5000
+    networks:
+      - bet_on_you_network
     command: flask run --host=0.0.0.0
 
   db:
@@ -27,3 +52,7 @@ services:
       - bet_on_you_network
     environment:
       MYSQL_ROOT_PASSWORD: root
+
+networks:
+  bet_on_you_network: {}
+

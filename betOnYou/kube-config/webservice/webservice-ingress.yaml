@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webservice-ingress
+  annotations:
+spec:
+  rules:
+  - host: bet-on-you
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: bet-on-you-webservice
+            port:
+              number: 5000
